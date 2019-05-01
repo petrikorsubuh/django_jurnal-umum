@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+        <div class="row">
+          <div class="col-md-4">
+          </div>
+          <div class="col-md-4">
+              <a href="/jurnal/tambah">Tambah</a>
+            <table class="table">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>No</th>
+                        <th>Nama Jurnal</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for j in jurnal %}
+                    <tr>
+                        <td>
+                            {{forloop.counter}}
+                        </td>
+                        <td>{{j.nama}}</td>
+                        <td>
+                            <a href="/jurnal/edit/{{j.id}}">Edit</a>
+                            <a href="/jurnal/delete/{{j.id}}">Hapus</a>
+                            <a href="">Detail</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>    
+            </table>
+          </div>
+          <div class="col-md-4">
+          </div>
+        </div>
+      </div>
+{% endblock content %}
