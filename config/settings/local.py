@@ -15,6 +15,6 @@ DATABASES = {
 # DATABASES = {
 #     'default': {
 #         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': os.path.join(BASE_DIR, 'jurnal-umum.mysql'),
+#         'NAME': os.path.join(BASE_DIR, 'jurnal_umum.mysql'),
 #     }
 #

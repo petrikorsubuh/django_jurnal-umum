@@ -4,11 +4,10 @@ from apps.jurnal import models
 from apps.jurnal import forms
 from braces.views import  StaffuserRequiredMixin,LoginRequiredMixin
 
-class LoginDulu(LoginRequiredMixin):
-    login_url='/login'
 
-class JurnalView(View,LoginDulu):
+class JurnalView(View,LoginRequiredMixin,StaffuserRequiredMixin):
     template_name = 'jurnal.html'
+    login_url = '/login'
 
     def get(self, request):
         form = forms.JurnalForm(request.POST)
@@ -20,7 +19,8 @@ class JurnalView(View,LoginDulu):
         })
 
 
-class SaveJurnalView(View,LoginDulu):
+class SaveJurnalView(View,LoginRequiredMixin,StaffuserRequiredMixin):
+    login_url = '/login'
 
     def post(self, request):
         jur = forms.JurnalForm(request.POST)
@@ -34,8 +34,8 @@ class SaveJurnalView(View,LoginDulu):
         
 
 
-class EditJurnalView(View,LoginDulu):
-    # login_url = '/login'
+class EditJurnalView(View,LoginRequiredMixin,StaffuserRequiredMixin):
+    login_url = '/login'
     template_name = 'edit_jurnal.html'
 
     def get(self, request, id):
@@ -55,12 +55,11 @@ class EditJurnalView(View,LoginDulu):
         })
 
 
-class UpdateJurnalView(View,LoginDulu):
-    # login_url = '/login'
+class UpdateJurnalView(View,LoginRequiredMixin,StaffuserRequiredMixin):
+    login_url = '/login'
     def post(self, request):
         form = forms.JurnalForm(request.POST)
         if form.is_valid():
-            print(form.is_valid())
             jurnal = models.Jurnal.objects.get(id=form.cleaned_data['id'])
             jurnal.nama = form.cleaned_data['nama']
             jurnal.keterangan = form.cleaned_data['keterangan']
@@ -70,16 +69,16 @@ class UpdateJurnalView(View,LoginDulu):
         return HttpResponse(form.errors)
 
 
-class DeleteJurnalView(View,LoginDulu):
-    # login_url = '/login'
+class DeleteJurnalView(View,LoginRequiredMixin,StaffuserRequiredMixin):
+    login_url = '/login'
     def get(self, request, id):
         obj = models.Jurnal.objects.get(id=id)
         obj.delete()
 
         return redirect('/jurnal')
 
-class TambahJurnalView(LoginDulu,View):
-    # login_url = '/login'
+class TambahJurnalView(View,LoginRequiredMixin,StaffuserRequiredMixin):
+    login_url = '/login'
     template_name = 'tambah_jurnal.html'
 
     def get(self, request):

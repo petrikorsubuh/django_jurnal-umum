@@ -1,100 +1,127 @@
 from django.shortcuts import render,redirect
-
+from .helpers import *
 from django.views import View
-
-from apps.detail import models
 from apps.detail import forms
+from apps.jurnal.models import Jurnal
+from apps.jurnal.forms import JurnalForm
+from apps.detail.models import JurnalDetail
 from braces.views import LoginRequiredMixin
-
-class LoginDulu(LoginRequiredMixin):
-    login_url='/login' 
+from  django.http import HttpResponse
 
 
-class DetailView(View,LoginDulu):
+
+class DetailView(View,LoginRequiredMixin):
+    login_url = '/login'
     template_name='jurnal_detail.html'
 
-    def get(self, request, id):
-        obj=models.JurnalDetail.get(id=id)
-        
+    def get(self, request, jurnal_id):
+        detail = JurnalDetail.objects.filter(jurnal_id=jurnal_id)
+        total_debt,total_kredit=count_detail(jurnal_id)
+        return render(request, self.template_name,{
+            'detail':detail,
+            'jurnal_id':jurnal_id,
+            'total_debt': total_debt,
+            'total_kredit': total_kredit
+            })
 
-class SaveDetailView(View,LoginDulu):
+class SaveDetailView(View,LoginRequiredMixin):
+    login_url = '/login'
 
     def post(self, request):
         form = forms.DetailForm(request.POST)
         if form.is_valid():
-            detail = models.JurnalDetail()
-            detail.item = form.cleaned_data['item']
+            detail = JurnalDetail()
+            detail.tanggal = form.cleaned_data['tanggal']
+            detail.deskripsi = form.cleaned_data['deskripsi']
             detail.kredit = form.cleaned_data['kredit']
+            detail.debt = form.cleaned_data['debt']
             detail.save()
             return redirect('/detail')
 
 
-class EditDetailView(View,LoginDulu):
+class EditDetailView(View,LoginRequiredMixin):
+    login_url = '/login'
 
-    template_name= 'Edit_detail.html'
+    template_name= 'edit_detail.html'
 
-    def get(self, request, id):
-        obj = models.JurnalDetail.objects.get(id=id)
-        data = {
+    def get(self, request, jurnal_id, id):
+        obj = JurnalDetail.objects.get(id=id)
+        form_data = {
+            'jurnal_id': jurnal_id,
             'id': obj.id,
-            'item': obj.item,
+            'tanggal': obj.tanggal,
+            'deskripsi': obj.deskripsi,
             'kredit': obj.kredit,
+            'debt': obj.debt,
         }
 
-        form = forms.DetailForm(initial=data)
-        detail = models.JurnalDetail.objects.all()
-
-        return render(request, self.template_name, {
+        form = forms.DetailForm(initial=form_data)
+        data = {
             'form': form,
-            'detail': detail
-        })
+            'obj':obj,
+            'jurnal_id': jurnal_id,
+            'a':id,
+        }
+        return render(request, self.template_name, data)
 
 
 
-class UpdateDetailView(View,LoginDulu):
+class UpdateDetailView(View,LoginRequiredMixin):
+    login_url = '/login'
 
-    def post(self, request):
+    def post(self, request, jurnal_id):
         form = forms.DetailForm(request.POST)
         if form.is_valid():
-            detail = models.Jurnal.objects.get(id=form.cleaned_data['id'])
-            detail.item = form.cleaned_data['item']
+            id = form.cleaned_data['id']
+            detail = JurnalDetail.objects.get(id=id)
+            detail.tanggal = form.cleaned_data['tanggal']
+            detail.deskripsi = form.cleaned_data['deskripsi']
             detail.kredit = form.cleaned_data['kredit']
+            detail.debt = form.cleaned_data['debt']
             detail.save()
-            
-            return redirect('/detail')
+
+            url_redirect = f'/detail/{jurnal_id}'
+            return redirect(url_redirect)
         return HttpResponse(form.errors)
 
 
 
-class DeleteDetailView(View,LoginDulu):
-    # login_url = '/login'
-    def get(self, request, id):
-        obj = models.JurnalDetail.objects.get(id=id)
+class DeleteDetailView(View,LoginRequiredMixin):
+    login_url = '/login'
+    def get(self, request, id,jurnal_id):
+        obj = JurnalDetail.objects.get(id=id)
         obj.delete()
+        url_redirect = f"/detail/{jurnal_id}"
+        return redirect(url_redirect)
 
-        return redirect('/detail')
-
-
-
-class TambahDetailView(View,LoginDulu):
-    # login_url = '/login'
+class TambahDetailView(View,LoginRequiredMixin):
+    login_url = '/login'
     template_name = 'tambah_detail.html'
 
-    def get(self, request):
+    def get(self, request, jurnal_id):
         form = forms.DetailForm(request.POST)
-        detail = models.JurnalDetail.objects.all()
 
         return render(request, self.template_name, {
             'form': form,
-            'detail': detail
+            'jurnal_id': jurnal_id
         })
 
-    def post(self, request):
-        form = forms.JurnalForm(request.POST)
+    def post(self, request,jurnal_id):
+        form = forms.DetailForm(request.POST)
         if form.is_valid():
-            jurnal = models.Jurnal()
-            jurnal.nama = form.cleaned_data['nama']
-            jurnal.save()
-            
-            return redirect('/jurnal')
-        return HttpResponse(form.errors)
+            jurnal = Jurnal.objects.get(pk=jurnal_id)
+            detail = JurnalDetail()
+            detail.jurnal= jurnal
+            detail.tanggal = form.cleaned_data['tanggal']
+            detail.deskripsi = form.cleaned_data['deskripsi']
+            detail.kredit = form.cleaned_data['kredit']
+            detail.debt = form.cleaned_data['debt']
+            detail.save()
+            url_redirec = f'/detail/{jurnal_id}'
+            return redirect(url_redirec)
+
+
+        return render(request, self.template_name, {
+            'form': form,
+            'jurnal_id': jurnal_id
+        })

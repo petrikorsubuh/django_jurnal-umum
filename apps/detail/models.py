@@ -10,7 +10,7 @@ class JurnalDetail(models.Model):
     debt = models.CharField(max_length=20,default=0.0,blank=True)
 
     def __str__(self):
-        return self.deskkripsi
+        return self.deskripsi
 
     class Meta:
         db_table = 'detail'

@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div class="container">
+  <div class="row">
+    <div class="col-md-3">
+    </div>
+    <div class="col-md-6">
+      <form action="{% url 'detail:update' jurnal_id %}" method="POST">
+          {% csrf_token %}
+          {{form.id}}
+          <div>
+              <label for="{{form.tanggal.id_for_label}}">{{form.tanggal.label}}</label>
+              {{form.tanggal}}
+          </div>
+          <div>
+              <label for="{{form.deskripsi.id_for_label}}">{{form.deskripsi.label}}</label>
+              {{form.deskripsi}}
+          </div>
+          <div>
+              <label for="{{form.kredit.id_for_label}}">{{form.kredit.label}}</label>
+              {{form.kredit}}
+          </div>
+          <div>
+              <label for="{{form.debt.id_for_label}}">{{form.debt.label}}</label>
+              {{form.debt}}
+          </div>
+          <button class="btn btn-primary" type="submit">Simpan</button>
+          <a href=""></a>
+
+      </form>
+    </div>
+    <div class="col-md-3">
+    </div>
+  </div>
+</div>
+{% endblock content %}
